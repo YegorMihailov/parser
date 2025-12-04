@@ -49,21 +49,17 @@ def get_btc_date():
     # Bitcoin Core's chainparams.cpp source file from the official GitHub repository
     url = "https://raw.githubusercontent.com/bitcoin/bitcoin/9a29b2d331eed5b4cbd6922f63e397b68ff12447/src/kernel/chainparams.cpp"
     
-    try:
-        response = requests.get(url)
-        content = response.text
+    response = requests.get(url)
+    content = response.text
+    
+    match = re.search(r'CreateGenesisBlock\(\s*(\d+)', content)
+    
+    if match:
+        timestamp = int(match.group(1))
         
-        match = re.search(r'CreateGenesisBlock\(\s*(\d+)', content)
+        dt = datetime.fromtimestamp(timestamp, timezone.utc)
         
-        if match:
-            timestamp = int(match.group(1))
-            
-            dt = datetime.fromtimestamp(timestamp, timezone.utc)
-            
-            return dt.strftime('%Y%m%d')
-
-    except Exception as e:
-        return f"Error fetching file: {e}"
+        return dt.strftime('%Y%m%d')
 
 def get_ISBN_10():
     """Returns the ISBN-10 number of "The C Programming Language" 2nd edition without hyphens"""
